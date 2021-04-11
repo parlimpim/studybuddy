@@ -10,6 +10,11 @@
       "StackName": "amplify-studybuddytake2-dev-174707",
       "StackId": "arn:aws:cloudformation:us-west-2:908774709359:stack/amplify-studybuddytake2-dev-174707/48d8bfc0-9ab3-11eb-b1b5-0650555310a3",
       "AmplifyAppId": "d2cvjafu4aijvc"
+    },
+    "categories": {
+      "auth": {
+        "studybuddytake28e2fa2c2": {}
+      }
     }
   }
 }

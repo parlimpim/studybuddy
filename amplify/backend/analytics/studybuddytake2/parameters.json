@@ -1,0 +1,21 @@
+{
+    "appName": "studybuddytake2",
+    "roleName": "pinpointLambdaRole9e03141e",
+    "cloudformationPolicyName": "cloudformationPolicy9e03141e",
+    "cloudWatchPolicyName": "cloudWatchPolicy9e03141e",
+    "pinpointPolicyName": "pinpointPolicy9e03141e",
+    "authPolicyName": "pinpoint_amplify_9e03141e",
+    "unauthPolicyName": "pinpoint_amplify_9e03141e",
+    "authRoleName": {
+        "Ref": "AuthRoleName"
+    },
+    "unauthRoleName": {
+        "Ref": "UnauthRoleName"
+    },
+    "authRoleArn": {
+        "Fn::GetAtt": [
+            "AuthRole",
+            "Arn"
+        ]
+    }
+}
