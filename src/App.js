@@ -71,6 +71,10 @@ const App = () => {
           credentials
         }
         console.log(pinpoint)
+        Analytics.record({
+          name: "testevent",
+          attributes: { title: user.username }
+        })
         Analytics.updateEndpoint({
           address: email,
           channelType: 'EMAIL',
