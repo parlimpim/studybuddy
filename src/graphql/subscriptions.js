@@ -34,3 +34,48 @@ export const onDeleteTodo = /* GraphQL */ `
     }
   }
 `;
+export const onCreateUser = /* GraphQL */ `
+  subscription OnCreateUser {
+    onCreateUser {
+      id
+      uid
+      email
+      task
+      description
+      due_date
+      type
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateUser = /* GraphQL */ `
+  subscription OnUpdateUser {
+    onUpdateUser {
+      id
+      uid
+      email
+      task
+      description
+      due_date
+      type
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteUser = /* GraphQL */ `
+  subscription OnDeleteUser {
+    onDeleteUser {
+      id
+      uid
+      email
+      task
+      description
+      due_date
+      type
+      createdAt
+      updatedAt
+    }
+  }
+`;

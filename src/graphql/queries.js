@@ -30,3 +30,40 @@ export const listTodos = /* GraphQL */ `
     }
   }
 `;
+export const getUser = /* GraphQL */ `
+  query GetUser($id: ID!) {
+    getUser(id: $id) {
+      id
+      uid
+      email
+      task
+      description
+      due_date
+      type
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listUsers = /* GraphQL */ `
+  query ListUsers(
+    $filter: ModelUserFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listUsers(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        uid
+        email
+        task
+        description
+        due_date
+        type
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;

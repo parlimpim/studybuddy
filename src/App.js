@@ -1,134 +1,363 @@
-import React, { useEffect, useState, useMemo } from 'react'
-import Amplify, { API, graphqlOperation, Auth, AWSPinpointProvider } from 'aws-amplify'
-import { createTodo } from './graphql/mutations'
-import { listTodos } from './graphql/queries'
-import { AmplifySignOut,withAuthenticator } from '@aws-amplify/ui-react'
-import Analytics from '@aws-amplify/analytics';
-
+import React, { useEffect, useState } from "react";
+import Amplify, { API, graphqlOperation, Auth } from "aws-amplify";
+import { createTodo, createUser, deleteUser } from "./graphql/mutations";
+import { listTodos, listUsers } from "./graphql/queries";
+import { AmplifySignOut, withAuthenticator } from "@aws-amplify/ui-react";
+import "./App.scss";
+import "bootstrap/dist/css/bootstrap.min.css";
 import awsExports from "./aws-exports";
+import { event } from "jquery";
 Amplify.configure(awsExports);
 
-const initialState = { name: '', description: '' }
+const initialState = {
+  uid: "",
+  email: "",
+  task: "",
+  due_date: "",
+  description: "",
+  type: "Task",
+};
 
 const App = () => {
-  const [formState, setFormState] = useState(initialState)
-  const [todos, setTodos] = useState([])
-  const [email, setEmail] = useState('')
-  const [user,setUser] = useState()
+  const [formState, setFormState] = useState(initialState);
+  const [current, setCurrent] = useState({ uid: "" });
+  const [todos, setTodos] = useState([]);
+  const [currentTab, setCurrentTab] = useState("Task");
 
   useEffect(() => {
-    fetchTodos()
-    test()
-    //pinpoint()
-  }, [])
+    getUsername();
+    fetchTodos();
+  }, []);
 
   function setInput(key, value) {
-    setFormState({ ...formState, [key]: value })
+    setFormState({ ...formState, [key]: value });
   }
 
   async function fetchTodos() {
     try {
-      const todoData = await API.graphql(graphqlOperation(listTodos))
-      const todos = todoData.data.listTodos.items
-      setTodos(todos)
-    } catch (err) { console.log('error fetching todos') }
-  }
-
-  async function addTodo() {
-    try {
-      if (!formState.name || !formState.description) return
-      const todo = { ...formState }
-      setTodos([...todos, todo])
-      setFormState(initialState)
-      await API.graphql(graphqlOperation(createTodo, {input: todo}))
+      const todoData = await API.graphql(graphqlOperation(listUsers));
+      const todos = todoData.data.listUsers.items;
+      setTodos(todos);
+      console.log("FetchTODo", todos);
     } catch (err) {
-      console.log('error creating todo:', err)
+      console.log("error fetching todos");
     }
   }
 
-  async function test() {
+  async function addTask() {
+    try {
+      if (!formState.task || !formState.description || !formState.due_date)
+        return;
+      const todo = { ...formState };
+      setTodos([...todos, todo]);
+      setFormState({ ...formState, task: "", description: "", due_date: "" });
+      await API.graphql(graphqlOperation(createUser, { input: todo }));
+      alert("Success!");
+      console.log("ADDtodo", todos);
+    } catch (err) {
+      console.log("error creating todo:", err);
+    }
+  }
+  //Still error
+  async function deleteTask(id) {
+    try {
+      await API.graphql(graphqlOperation(deleteUser, { input: id }));
+      console.log(id)
+    } catch (err) {
+      console.log("error deleting todo:", err);
+    }
+  }
+
+  async function addClip() {
+    try {
+      if (!formState.task || !formState.description || !formState.due_date)
+        return;
+      const todo = { ...formState, type: "Clip" };
+      setTodos([...todos, todo]);
+      setFormState({ ...formState, task: "", description: "", due_date: "" });
+      await API.graphql(graphqlOperation(createUser, { input: todo }));
+      alert("Success!");
+      console.log("ADDtodo", todos);
+    } catch (err) {
+      console.log("error creating todo:", err);
+    }
+  }
+
+  async function addExam() {
+    try {
+      if (!formState.task || !formState.description || !formState.due_date)
+        return;
+      const todo = { ...formState, type: "Exam" };
+      setTodos([...todos, todo]);
+      setFormState({ ...formState, task: "", description: "", due_date: "" });
+      await API.graphql(graphqlOperation(createUser, { input: todo }));
+      alert("Success!");
+      console.log("ADDtodo", todos);
+    } catch (err) {
+      console.log("error creating todo:", err);
+    }
+  }
+
+  async function getUsername() {
     try {
       await Auth.currentUserInfo().then((d) => {
-        setUser(d)
-        setEmail(d.attributes.email)
-      })
-    }
-    catch (e) {
-      console.log(e)
+        console.log(d.username);
+        console.log(d.attributes.email);
+        setFormState({
+          ...formState,
+          uid: d.username,
+          email: d.attributes.email,
+        });
+        setCurrent({ uid: d.username });
+      });
+    } catch (e) {
+      console.log(e);
     }
   }
-  
-  async function pinpoint() {
-    try {
-      await Auth.currentUserCredentials().then((credentials) => {
-        console.log(credentials)
-        console.log(credentials.identityId)
-        const pinpoint = {
-          region: awsExports.aws_mobile_analytics_app_region,
-          credentials
-        }
-        console.log(pinpoint)
-        // Analytics.record({
-        //   name: "testevent",
-        //   attributes: { title: user.username }
-        // })
-        Analytics.updateEndpoint({
-          address: email,
-          channelType: 'EMAIL',
-          optOut: 'NONE',
-          userId: user.attributes.sub,
-          userAttributes: {
-            username: [user.username]
-          }
-        }).then((d) => {
-          console.log(d)
-        })
-      })
+
+  const display = () => {
+    // setFormState({initialState})
+    switch (currentTab) {
+      case "Task":
+        return (
+          <div style={styles.mgt}>
+            {" "}
+            <input
+              onChange={(event) => setInput("task", event.target.value)}
+              style={styles.input}
+              value={formState.task}
+              placeholder="Task"
+            />
+            <input
+              type="text"
+              onFocus={(event) => (event.currentTarget.type = "date")}
+              onBlur={(event) => (event.currentTarget.type = "text")}
+              onChange={(event) => setInput("due_date", event.target.value)}
+              style={styles.input}
+              value={formState.due_date}
+              placeholder="Due-Date"
+            />
+            <input
+              onChange={(event) => setInput("description", event.target.value)}
+              style={styles.input}
+              value={formState.description}
+              placeholder="Description"
+            />
+            <button style={styles.button} onClick={addTask}>
+              Create Todo
+            </button>
+            {todos.map((todo, index) =>
+              todo.uid == current.uid && todo.type == "Task" ? (
+                <div key={todo.id ? todo.id : index} style={styles.todo}>
+                  <p style={styles.todoName}>{todo.task}</p>
+                  <p style={styles.todoDescription}>{todo.due_date}</p>
+                  <p style={styles.todoDescription}>{todo.description}</p>
+                  {console.log(todo.id)}
+                  <button class="btn btn-danger" onClick = {deleteTask(todo.id)}> Delete</button>
+                </div>
+              ) : (
+                <></>
+              )
+            )}{" "}
+          </div>
+        );
+
+      case "Clip":
+        return (
+          <div style={styles.mgt}>
+            {" "}
+            <input
+              onChange={(event) => setInput("task", event.target.value)}
+              style={styles.input}
+              value={formState.task}
+              placeholder="Task"
+            />
+            <input
+              type="text"
+              onFocus={(event) => (event.currentTarget.type = "date")}
+              onBlur={(event) => (event.currentTarget.type = "text")}
+              onChange={(event) => setInput("due_date", event.target.value)}
+              style={styles.input}
+              value={formState.due_date}
+              placeholder="Due-Date"
+            />
+            <input
+              onChange={(event) => setInput("description", event.target.value)}
+              style={styles.input}
+              value={formState.description}
+              placeholder="link"
+            />
+            <button style={styles.button} onClick={addClip}>
+              Create Todo
+            </button>
+            {todos.map((todo, index) =>
+              todo.uid == current.uid && todo.type == "Clip" ? (
+                <div key={todo.id ? todo.id : index} style={styles.todo}>
+                  <p style={styles.todoName}>{todo.task}</p>
+                  <p style={styles.todoDescription}>{todo.due_date}</p>
+                  <p style={styles.todoDescription}>{todo.description}</p>
+                </div>
+              ) : (
+                <></>
+              )
+            )}
+          </div>
+        );
+
+      case "Exam":
+        return (
+          <div style={styles.mgt}>
+            {" "}
+            <input
+              onChange={(event) => setInput("task", event.target.value)}
+              style={styles.input}
+              value={formState.task}
+              placeholder="Task"
+            />
+            <input
+              type="text"
+              onFocus={(event) => (event.currentTarget.type = "date")}
+              onBlur={(event) => (event.currentTarget.type = "text")}
+              onChange={(event) => setInput("due_date", event.target.value)}
+              style={styles.input}
+              value={formState.due_date}
+              placeholder="Exam-Date"
+            />
+            <input
+              onChange={(event) => setInput("description", event.target.value)}
+              style={styles.input}
+              value={formState.description}
+              placeholder="Description"
+            />
+            <button style={styles.button} onClick={addExam}>
+              Create Todo
+            </button>
+            {todos.map((todo, index) =>
+              todo.uid == current.uid && todo.type == "Exam" ? (
+                <div key={todo.id ? todo.id : index} style={styles.todo}>
+                  <p style={styles.todoName}>{todo.task}</p>
+                  <p style={styles.todoDescription}>{todo.due_date}</p>
+                  <p style={styles.todoDescription}>{todo.description}</p>
+                </div>
+              ) : (
+                <></>
+              )
+            )}
+          </div>
+        );
     }
-    catch (e) {
-      console.log(e)
-    }
-  } 
+  };
+
   return (
     <div style={styles.container}>
-      <h2>Amplify Todos</h2>
-      <input
-        onChange={event => setInput('name', event.target.value)}
-        style={styles.input}
-        value={formState.name}
-        placeholder="Name"
-      />
-      <input
-        onChange={event => setInput('description', event.target.value)}
-        style={styles.input}
-        value={formState.description}
-        placeholder="Description"
-      />
-      <button style={styles.button} onClick={addTodo}>Create Todo</button>
-      {
-        todos.map((todo, index) => (
-          <div key={todo.id ? todo.id : index} style={styles.todo}>
-            <p style={styles.todoName}>{todo.name}</p>
-            <p style={styles.todoDescription}>{todo.description}</p>
-          </div>
-        ))
-      }
-      {console.log(email)}
-      {console.log(user)}
-      <button onClick={test}>get userinfo</button>
-      <button onClick={pinpoint}>test pinpoint</button>
+      <h2>Welcome!</h2>
+      <ul className="nav nav-pills nav-fill">
+        <li className="nav-item">
+          <a
+            className={`nav-link ${
+              currentTab == "Task" ? "active font-login" : "font-login"
+            }`}
+            onClick={(e) => {
+              setCurrentTab("Task");
+              setFormState({
+                ...formState,
+                task: "",
+                description: "",
+                due_date: "",
+                type: "Task",
+              });
+              console.log(formState);
+            }}
+          >
+            Task
+          </a>
+        </li>
+        <li className="nav-item">
+          <a
+            className={`nav-link ${
+              currentTab == "Clip" ? "active font-login" : "font-login"
+            }`}
+            onClick={(e) => {
+              setCurrentTab("Clip");
+              setFormState({
+                ...formState,
+                task: "",
+                description: "",
+                due_date: "",
+                type: "Clip",
+              });
+              console.log(formState);
+            }}
+          >
+            Clip
+          </a>
+        </li>
+        <li className="nav-item ">
+          <a
+            className={`nav-link ${
+              currentTab == "Exam" ? "active font-login" : "font-login"
+            }`}
+            onClick={(e) => {
+              setCurrentTab("Exam");
+              setFormState({
+                ...formState,
+                task: "",
+                description: "",
+                due_date: "",
+                type: "Exam",
+              });
+              console.log(formState);
+            }}
+          >
+            Exam
+          </a>
+        </li>
+      </ul>
+      {/* <button onClick={getUsername}>pim</button> */}
+      <div className="pane-area-container "> {display()} </div>
       <AmplifySignOut />
     </div>
-  )
-}
+  );
+};
 
 const styles = {
-  container: { width: 400, margin: '0 auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 20 },
-  todo: {  marginBottom: 15 },
-  input: { border: 'none', backgroundColor: '#ddd', marginBottom: 10, padding: 8, fontSize: 18 },
-  todoName: { fontSize: 20, fontWeight: 'bold' },
+  container: {
+    width: 600,
+    margin: "0 auto",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    padding: 20,
+  },
+  todo: { border: "solid", marginTop: 5, marginBottom: 5 },
+  input: {
+    border: "none",
+    backgroundColor: "#ddd",
+    marginBottom: 5,
+    padding: 8,
+    fontSize: 18,
+    width: 560,
+    // color: "transparent"
+  },
+  todoName: { fontSize: 20, fontWeight: "bold" },
   todoDescription: { marginBottom: 0 },
-  button: { backgroundColor: 'black', color: 'white', outline: 'none', fontSize: 18, padding: '12px 0px' }
-}
+  button: {
+    backgroundColor: "black",
+    color: "white",
+    outline: "none",
+    fontSize: 18,
+    padding: "12px 0px",
+    width: 560,
+  },
+  list_item: {
+    border: "solid",
+  },
+  font_color: {
+    color: "black",
+  },
+  mgt: {
+    marginTop: 10,
+  },
+};
 
-export default withAuthenticator(App)
+export default withAuthenticator(App);
