@@ -19,7 +19,7 @@ const App = () => {
   useEffect(() => {
     fetchTodos()
     test()
-    pinpoint()
+    //pinpoint()
   }, [])
 
   function setInput(key, value) {
@@ -49,9 +49,6 @@ const App = () => {
   async function test() {
     try {
       await Auth.currentUserInfo().then((d) => {
-        // console.log(d)
-        // console.log(d.username)
-        // console.log(d.attributes.email)
         setUser(d)
         setEmail(d.attributes.email)
       })
@@ -71,10 +68,10 @@ const App = () => {
           credentials
         }
         console.log(pinpoint)
-        Analytics.record({
-          name: "testevent",
-          attributes: { title: user.username }
-        })
+        // Analytics.record({
+        //   name: "testevent",
+        //   attributes: { title: user.username }
+        // })
         Analytics.updateEndpoint({
           address: email,
           channelType: 'EMAIL',
@@ -83,6 +80,8 @@ const App = () => {
           userAttributes: {
             username: [user.username]
           }
+        }).then((d) => {
+          console.log(d)
         })
       })
     }
@@ -116,9 +115,8 @@ const App = () => {
       }
       {console.log(email)}
       {console.log(user)}
-      {/* <button onClick={test}>pim</button> */}
-      <button onClick={pinpoint}>pinpoint</button>
-      {/* {Auth.signUp()} */}
+      <button onClick={test}>get userinfo</button>
+      <button onClick={pinpoint}>test pinpoint</button>
       <AmplifySignOut />
     </div>
   )
