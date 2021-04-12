@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import Amplify, { API, graphqlOperation, Auth } from 'aws-amplify'
+import React, { useEffect, useState, useMemo } from 'react'
+import Amplify, { API, graphqlOperation, Auth, AWSPinpointProvider } from 'aws-amplify'
 import { createTodo } from './graphql/mutations'
 import { listTodos } from './graphql/queries'
 import { AmplifySignOut,withAuthenticator } from '@aws-amplify/ui-react'
+import Analytics from '@aws-amplify/analytics';
 
 import awsExports from "./aws-exports";
 Amplify.configure(awsExports);
@@ -12,9 +13,13 @@ const initialState = { name: '', description: '' }
 const App = () => {
   const [formState, setFormState] = useState(initialState)
   const [todos, setTodos] = useState([])
+  const [email, setEmail] = useState('')
+  const [user,setUser] = useState()
 
   useEffect(() => {
     fetchTodos()
+    test()
+    pinpoint()
   }, [])
 
   function setInput(key, value) {
@@ -44,8 +49,37 @@ const App = () => {
   async function test() {
     try {
       await Auth.currentUserInfo().then((d) => {
-        console.log(d.username)
-        console.log(d.attributes.email)
+        // console.log(d)
+        // console.log(d.username)
+        // console.log(d.attributes.email)
+        setUser(d)
+        setEmail(d.attributes.email)
+      })
+    }
+    catch (e) {
+      console.log(e)
+    }
+  }
+  
+  async function pinpoint() {
+    try {
+      await Auth.currentUserCredentials().then((credentials) => {
+        console.log(credentials)
+        console.log(credentials.identityId)
+        const pinpoint = {
+          region: awsExports.aws_mobile_analytics_app_region,
+          credentials
+        }
+        console.log(pinpoint)
+        Analytics.updateEndpoint({
+          address: email,
+          channelType: 'EMAIL',
+          optOut: 'NONE',
+          userId: user.attributes.sub,
+          userAttributes: {
+            username: [user.username]
+          }
+        })
       })
     }
     catch (e) {
@@ -76,7 +110,10 @@ const App = () => {
           </div>
         ))
       }
-      <button onClick={test}>pim</button>
+      {console.log(email)}
+      {console.log(user)}
+      {/* <button onClick={test}>pim</button> */}
+      <button onClick={pinpoint}>pinpoint</button>
       {/* {Auth.signUp()} */}
       <AmplifySignOut />
     </div>
