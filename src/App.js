@@ -16,6 +16,7 @@ const initialState = {
   due_date: "",
   description: "",
   type: "Task",
+  // disable: true,
 };
 
 const App = () => {
@@ -49,9 +50,11 @@ const App = () => {
       if (!formState.task || !formState.description || !formState.due_date)
         return;
       const todo = { ...formState };
-      setTodos([...todos, todo]);
+      // setTodos([...todos, todo]);
       setFormState({ ...formState, task: "", description: "", due_date: "" });
       await API.graphql(graphqlOperation(createUser, { input: todo }));
+      // alert("Success!");
+      await fetchTodos();
       alert("Success!");
       console.log("ADDtodo", todos);
     } catch (err) {
@@ -59,10 +62,13 @@ const App = () => {
     }
   }
   //Still error
-  async function deleteTask(id) {
+  async function deleteTask(cid) {
     try {
-      await API.graphql(graphqlOperation(deleteUser, { input: id }));
-      console.log(id)
+      const detail = { id: cid };
+      await API.graphql(graphqlOperation(deleteUser, { input: detail }));
+      await fetchTodos();
+      alert("Success!");
+      console.log(detail);
     } catch (err) {
       console.log("error deleting todo:", err);
     }
@@ -149,11 +155,35 @@ const App = () => {
             {todos.map((todo, index) =>
               todo.uid == current.uid && todo.type == "Task" ? (
                 <div key={todo.id ? todo.id : index} style={styles.todo}>
-                  <p style={styles.todoName}>{todo.task}</p>
+                  <input
+                    class="noborder"
+                    disabled={true}
+                    style={styles.todoName}
+                    value={todos[index].task}
+                    type="text"
+                    onChange={(e) => {
+                      let temp = [...todos];
+                      temp[index].task = e.target.value;
+                      setTodos(temp);
+                      console.log(todos);
+                    }}
+                  />
                   <p style={styles.todoDescription}>{todo.due_date}</p>
                   <p style={styles.todoDescription}>{todo.description}</p>
                   {console.log(todo.id)}
-                  <button class="btn btn-danger" onClick = {deleteTask(todo.id)}> Delete</button>
+
+                  <button class="btn btn-success margin-2" onClick={() => {}}>
+                    Edit
+                  </button>
+
+                  <button
+                    class="btn btn-danger"
+                    onClick={() => {
+                      deleteTask(todo.id);
+                    }}
+                  >
+                    Delete
+                  </button>
                 </div>
               ) : (
                 <></>
