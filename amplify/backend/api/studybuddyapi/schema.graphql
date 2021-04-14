@@ -5,8 +5,9 @@ type Todo @model {
 }
 
 type User @model {
+  id : ID!
   uid: String!
-  email: String!
+  email: String
   task: String
   description: String
   due_date : String
