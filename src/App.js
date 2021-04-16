@@ -186,7 +186,7 @@ const App = () => {
               placeholder="Description"
             />
             <button style={styles.button} onClick={addTask}>
-              Create Todo
+              Add to list
             </button>
             {todos.map((todo, index) =>
               todo.uid == current.uid && todo.type == "Task" ? (
@@ -195,45 +195,53 @@ const App = () => {
                   style={styles.todo}
                   className="d-flex p-4 justify-content-between"
                 >
-                  <p style={styles.todoName} className = "">{todo.task}</p>
-                  <div>
+                  <div className = "fixed-size">
+                  <p style={styles.todoName} className="">
+                    {todo.task}
+                  </p>
+                  </div>
+                  <div className = "fixed-size2">
                     <div className="d-flex flex-row">
                       <p style={styles.todoDescription} className="font-bold">
                         Due Date :
                       </p>
-                      <p style={styles.todoDescription} className = "pl-1">{todo.due_date}</p>
+                      <p style={styles.todoDescription} className="pl-1">
+                        {todo.due_date}
+                      </p>
                     </div>
-                    <div className="d-flex flex-row">
+                    <div className="d-flex flex-row ">
                       <p style={styles.todoDescription} className="font-bold">
                         Description :
                       </p>
-                      <p style={styles.todoDescription} className = "pl-1">{todo.description}</p>
+                      <p style={styles.todoDescription} className="pl-1">
+                        {todo.description}
+                      </p>
                     </div>
                   </div>
 
                   {console.log(todo.id)}
                   <div className="d-flex flex-row ">
-                  <div className = "pr-1">
-                  <button
-                    class="btn btn-success margin-2 fixed-size"
-                    onClick={() => {
-                      setForPopup(todo);
-                      handleShow();
-                      console.log(forPopup);
-                    }}
-                  >
-                    Edit
-                  </button>
+                    <div className="pr-1">
+                      <button
+                        class="btn btn-success margin-2 fixed-size"
+                        onClick={() => {
+                          setForPopup(todo);
+                          handleShow();
+                          console.log(forPopup);
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </div>
+                    <button
+                      class="btn btn-danger fixed-size"
+                      onClick={() => {
+                        deleteTask(todo.id);
+                      }}
+                    >
+                      Delete
+                    </button>
                   </div>
-                  <button
-                    class="btn btn-danger fixed-size"
-                    onClick={() => {
-                      deleteTask(todo.id);
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
                 </div>
               ) : (
                 <></>
@@ -268,33 +276,60 @@ const App = () => {
               placeholder="link"
             />
             <button style={styles.button} onClick={addClip}>
-              Create Todo
+              Add to list
             </button>
             {todos.map((todo, index) =>
               todo.uid == current.uid && todo.type == "Clip" ? (
-                <div key={todo.id ? todo.id : index} style={styles.todo}>
-                  <p style={styles.todoName}>{todo.task}</p>
-                  <p style={styles.todoDescription}>{todo.due_date}</p>
-                  <p style={styles.todoDescription}>{todo.description}</p>
-                  <button
-                    class="btn btn-success margin-2"
-                    onClick={() => {
-                      setForPopup(todo);
-                      handleShow();
-                      console.log(forPopup);
-                    }}
-                  >
-                    Edit
-                  </button>
+                <div
+                  key={todo.id ? todo.id : index}
+                  style={styles.todo}
+                  className="d-flex p-4 justify-content-between"
+                >
+                  <p style={styles.todoName} className="">
+                    {todo.task}
+                  </p>
+                  <div>
+                    <div className="d-flex flex-row">
+                      <p style={styles.todoDescription} className="font-bold">
+                        Due Date :
+                      </p>
+                      <p style={styles.todoDescription} className="pl-1">
+                        {todo.due_date}
+                      </p>
+                    </div>
+                    <div className="d-flex flex-row">
+                      <p style={styles.todoDescription} className="font-bold">
+                        Link :
+                      </p>
+                      <p style={styles.todoDescription} className="pl-1">
+                        {todo.description}
+                      </p>
+                    </div>
+                  </div>
 
-                  <button
-                    class="btn btn-danger"
-                    onClick={() => {
-                      deleteTask(todo.id);
-                    }}
-                  >
-                    Delete
-                  </button>
+                  {console.log(todo.id)}
+                  <div className="d-flex flex-row ">
+                    <div className="pr-1">
+                      <button
+                        class="btn btn-success margin-2 fixed-size"
+                        onClick={() => {
+                          setForPopup(todo);
+                          handleShow();
+                          console.log(forPopup);
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </div>
+                    <button
+                      class="btn btn-danger fixed-size"
+                      onClick={() => {
+                        deleteTask(todo.id);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <></>
@@ -329,33 +364,60 @@ const App = () => {
               placeholder="Description"
             />
             <button style={styles.button} onClick={addExam}>
-              Create Todo
+              Add to list
             </button>
             {todos.map((todo, index) =>
               todo.uid == current.uid && todo.type == "Exam" ? (
-                <div key={todo.id ? todo.id : index} style={styles.todo}>
-                  <p style={styles.todoName}>{todo.task}</p>
-                  <p style={styles.todoDescription}>{todo.due_date}</p>
-                  <p style={styles.todoDescription}>{todo.description}</p>
-                  <button
-                    class="btn btn-success margin-2"
-                    onClick={() => {
-                      setForPopup(todo);
-                      handleShow();
-                      console.log(forPopup);
-                    }}
-                  >
-                    Edit
-                  </button>
+                <div
+                  key={todo.id ? todo.id : index}
+                  style={styles.todo}
+                  className="d-flex p-4 justify-content-between"
+                >
+                  <p style={styles.todoName} className="">
+                    {todo.task}
+                  </p>
+                  <div>
+                    <div className="d-flex flex-row">
+                      <p style={styles.todoDescription} className="font-bold">
+                        Due Date :
+                      </p>
+                      <p style={styles.todoDescription} className="pl-1">
+                        {todo.due_date}
+                      </p>
+                    </div>
+                    <div className="d-flex flex-row">
+                      <p style={styles.todoDescription} className="font-bold">
+                        Description :
+                      </p>
+                      <p style={styles.todoDescription} className="pl-1">
+                        {todo.description}
+                      </p>
+                    </div>
+                  </div>
 
-                  <button
-                    class="btn btn-danger"
-                    onClick={() => {
-                      deleteTask(todo.id);
-                    }}
-                  >
-                    Delete
-                  </button>
+                  {console.log(todo.id)}
+                  <div className="d-flex flex-row ">
+                    <div className="pr-1">
+                      <button
+                        class="btn btn-success margin-2 fixed-size"
+                        onClick={() => {
+                          setForPopup(todo);
+                          handleShow();
+                          console.log(forPopup);
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </div>
+                    <button
+                      class="btn btn-danger fixed-size"
+                      onClick={() => {
+                        deleteTask(todo.id);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <></>
