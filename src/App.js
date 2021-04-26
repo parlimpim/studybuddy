@@ -16,7 +16,6 @@ import Button from "react-bootstrap/Button";
 import awsExports from "./aws-exports";
 import { event } from "jquery";
 Amplify.configure(awsExports);
-
 const initialState = {
   uid: "",
   email: "",
